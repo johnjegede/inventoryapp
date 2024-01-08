@@ -3,7 +3,7 @@ import {View, Text, StyleSheet,Pressable} from 'react-native';
 import PageHeading from '../components/PageHeading'
 
 
-export default function Dashboard() {
+export default function Dashboard({navigation}) {
 
   return(
     <View style={pageStyle.container}>
@@ -23,8 +23,8 @@ export default function Dashboard() {
         <Text style={pageStyle.textNum}>2</Text>
         </Pressable>
       </View>
-      <Pressable
-        style={pageStyle.button1}>
+      <Pressable onPress={()=>navigation.navigate('AddItem')}
+       style={pageStyle.button1}>
         <Text style={pageStyle.textAdd}>Add an item</Text>
       </Pressable>
     </View>
@@ -40,8 +40,11 @@ const pageStyle = StyleSheet.create({
   listInven:{
     borderWidth: 2,
     borderColor:'black',
+    justifyContent:'center',
+    alignItems:'center',
     marginVertical:32,
     marginHorizontal:34,
+    paddingVertical:20,
     borderRadius:20
   },
     listStock:{
@@ -49,7 +52,9 @@ const pageStyle = StyleSheet.create({
     borderColor:'black',
     width:135,
     height: 135,
-    borderRadius:20
+    borderRadius:20,
+    justifyContent:'center',
+    alignItems:'center',
     
 
   },
@@ -63,7 +68,7 @@ const pageStyle = StyleSheet.create({
   textItem:{
     fontSize:20,
     textAlign:'center',
-    marginTop: 24,
+    
 
   },
   textNum:{
@@ -77,7 +82,7 @@ const pageStyle = StyleSheet.create({
   button1: {
     alignItems: "center",
     justifyContent: "center",
-    padding: 20,
+    padding: 10,
     marginHorizontal: 60,
     marginVertical: 40,
     borderRadius: 40,

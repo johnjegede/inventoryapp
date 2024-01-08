@@ -79,8 +79,9 @@ export default function EditItem() {
               numberOfLines={4}
               onChangeText={onChangeNote}
             />
+
+            <Button color="blue" title="Save Item" />
           </View>
-          <Button color="blue" title="Save Item" />
         </ScrollView>
       </KeyboardAvoidingView>
     </View>
@@ -102,8 +103,7 @@ const pageStyle = StyleSheet.create({
     marginHorizontal: 20,
     borderRadius: 20,
     marginVertical: 20,
-    height: 240,
-    //  flex:0.4,
+    height: 220,
   },
   imageStyle: {
     resizeMode: "cover",

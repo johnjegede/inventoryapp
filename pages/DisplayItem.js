@@ -10,34 +10,38 @@ import {
 } from "react-native";
 import PageHeading from "../components/PageHeading";
 
-export default function DisplayItem() {
+export default function DisplayItem({ navigation }) {
   // const [delVal, setDelVal] = useState(false)
   let delVal = false;
+  const changeVal = () => {
+    console.log("Cancel Pressed");
+    delVal = false;
+    console.log(delVal);
+  };
 
-  const createTwoButtonAlert = () =>
-    Alert.alert("You are deleting an item", "Do you want to delet it", [
+  const changeOk = () => {
+    console.log("Ok Pressed");
+    delVal = true;
+    console.log(delVal);
+  };
+
+  const createTwoButtonAlert = () => {
+    Alert.alert("You are deleting an item", "Do you want to delete it", [
       {
         text: "Cancel",
-        onPress: () => {
-          console.log("Cancel Pressed");
-          delVal = false;
-          console.log(delVal);
-        },
+        onPress: changeVal,
         style: "cancel",
       },
       {
         text: "OK",
-        onPress: () => {
-          delVal = true;
-          console.log("OK Presse");
-          console.log(delVal);
-        },
+        onPress: changeOk,
       },
     ]);
+  };
 
   return (
     <View style={pageStyle.container}>
-      <PageHeading name="Display Item" edit={true} />
+      <PageHeading name="Display Item" edit={true} navigation={navigation} />
       <View style={pageStyle.imgContainer}>
         <Image style={pageStyle.imageStyle} src="" />
       </View>
@@ -51,12 +55,13 @@ export default function DisplayItem() {
 
         <Text style={pageStyle.text}>Note</Text>
         <Text style={pageStyle.messageInput}></Text>
+
+        <Button
+          color="red"
+          title="Delete"
+          onPress={createTwoButtonAlert}
+        ></Button>
       </View>
-      <Button
-        color="red"
-        title="Delete"
-        onPress={createTwoButtonAlert}
-      ></Button>
     </View>
   );
 }
@@ -66,7 +71,7 @@ const pageStyle = StyleSheet.create({
     flex: 1,
   },
   container1: {
-    flex: 0.8,
+    flex: 1,
   },
 
   imgContainer: {
@@ -77,7 +82,7 @@ const pageStyle = StyleSheet.create({
     marginHorizontal: 20,
     borderRadius: 20,
     marginVertical: 20,
-    height: 240,
+    height: 220,
     //  flex:0.4,
   },
   imageStyle: {
@@ -95,7 +100,7 @@ const pageStyle = StyleSheet.create({
     fontSize: 16,
   },
   messageInput: {
-    height: 100,
+    height: 80,
     margin: 12,
     borderWidth: 2,
     borderRadius: 20,

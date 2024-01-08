@@ -1,14 +1,17 @@
 import React, { useState } from "react";
 import { View, Text, StyleSheet, Pressable, TextInput } from "react-native";
 
-export default function PageHeading({ name, edit, search }) {
+export default function PageHeading({ name, edit, search, navigation }) {
   const [searchIteam, onChangeSearchItem] = useState("");
 
   return (
     <View style={pageStyle.container}>
       <Text style={pageStyle.itemText}>{name}</Text>
       {edit && (
-        <Pressable style={pageStyle.button}>
+        <Pressable
+          onPress={() => navigation.navigate("EditItem")}
+          style={pageStyle.button}
+        >
           <Text style={pageStyle.text}> Edit Item </Text>
         </Pressable>
       )}
@@ -26,12 +29,12 @@ export default function PageHeading({ name, edit, search }) {
 
 const pageStyle = StyleSheet.create({
   container: {
-    height: "5%",
-    marginTop: 50,
+    height: "8%",
     borderBottomWidth: 2,
     justifyContent: "space-between",
     borderBottomColor: "black",
     flexDirection: "row",
+    alignItems: "center",
   },
 
   itemText: {
@@ -55,8 +58,8 @@ const pageStyle = StyleSheet.create({
   },
   input: {
     height: 40,
-    width: "50%",
-    margin: 0,
+    width: "64%",
+    marginRight: 10,
     borderWidth: 2,
     borderRadius: 10,
     padding: 5,
