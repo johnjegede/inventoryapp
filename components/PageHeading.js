@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { View, Text, StyleSheet, Pressable, TextInput } from "react-native";
 
-export default function PageHeading({ name, edit, search, navigation }) {
+export default function PageHeading({ name, edit, search, navigation, itemDetails }) {
   const [searchIteam, onChangeSearchItem] = useState("");
 
   return (
@@ -9,7 +9,7 @@ export default function PageHeading({ name, edit, search, navigation }) {
       <Text style={pageStyle.itemText}>{name}</Text>
       {edit && (
         <Pressable
-          onPress={() => navigation.navigate("EditItem")}
+          onPress={() => navigation.navigate("EditItem", {itemData: itemDetails})}
           style={pageStyle.button}
         >
           <Text style={pageStyle.text}> Edit Item </Text>

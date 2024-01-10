@@ -1,49 +1,73 @@
-import React,{useState} from 'react'
+import React,{useState, useEffect} from 'react'
 import {View, Text, StyleSheet,Pressable, Image,Button,FlatList,TouchableOpacity,Alert} from 'react-native';
 import PageHeading from '../components/PageHeading';
 import { Ionicons } from '@expo/vector-icons'; 
 import { MaterialIcons } from '@expo/vector-icons'; 
+import { query,
+    collection,
+    onSnapshot, getDocs } from "firebase/firestore"; 
+import {db} from '../firebaseConfig'
+import { Firestore } from 'firebase/firestore';
+import { useIsFocused } from '@react-navigation/native';
 
 
 const DATA = [
   {
     id: 'bd7acbea-c1b1-46c2-aed5-3ad53abb28ba',
     title: 'First Item',
-  },
-  {
-    id: '3ac68afc-c605-48d3-a4f8-fbd91aa97f63',
-    title: 'Second Item',
-  },
-  {
-    id: '58694a0f-3da1-471f-bd96-145571e29d72',
-    title: 'Third Item',
-  },
+  }
 ];
-
-
-
-const Item = ({item, onPress, backgroundColor, textColor, del}) => (
-  <TouchableOpacity onPress={onPress} style={[pageStyle.item, {backgroundColor}]}>
-    <View style ={pageStyle.thumb}>
-    <Image />
-    </View>
-    <View style ={pageStyle.thumbtext}>
-    <Text style={[pageStyle.title, {color: textColor}]}>{item.title}</Text>
-    <View style ={pageStyle.thumbicon}>
-    <Ionicons name="add-circle-outline" size={34} color="black" />
-    <Text style={{textAlign:'center',fontWeight:'bold',fontSize:24}}>12</Text>
-    <Pressable onPress={del}><MaterialIcons name="delete-forever" size={34} color="black" /></Pressable>
-    </View>
-    </View> 
-    
-  </TouchableOpacity>
-);
 
 
 export default function Inventory({ navigation }){
 
   const [selectedId, setSelectedId] = useState();
+  const [loading, setLoading] = useState(false); // Set loading to true on component mount
+  const [listStock, setListStock] = useState([]);
   let delVal = false
+  const isFocused = useIsFocused();;
+//   console.log(isFocused)
+
+
+
+
+useEffect ( () => {
+   
+       let listStockArr = []
+       async function getData() {
+       const querySnapshot = await getDocs(collection(db, "stock"));
+       querySnapshot.forEach((doc) => {
+           listStockArr.push({...doc.data(), id: doc.id})
+        //  console.log(`${doc.id} => ${doc.data()}`);
+       });
+       setListStock(listStockArr)
+       // console.log(listStock)
+   }
+   isFocused && getData()
+   setLoading(true)
+   
+   }, [isFocused])
+
+// console.log(listStock)
+
+
+
+const Item = ({item, onPress, backgroundColor, textColor, del}) => (
+    <TouchableOpacity onPress={onPress} style={[pageStyle.item, {backgroundColor}]}>
+      <View style ={pageStyle.thumb}>
+      <Image source={{ uri: item.imageSrc }} style={pageStyle.imageStyle} />
+      </View>
+      <View style ={pageStyle.thumbtext}>
+      <Text style={[pageStyle.title, {color: textColor}]}>{item.itemName}</Text>
+      <View style ={pageStyle.thumbicon}>
+      <Ionicons name="add-circle-outline" size={34} color="black" />
+      <Text style={{textAlign:'center',fontWeight:'bold',fontSize:24}}>{item.itemAmount}</Text>
+      <Pressable onPress={del}><MaterialIcons name="delete-forever" size={34} color="black" /></Pressable>
+      </View>
+      </View> 
+      
+    </TouchableOpacity>
+  );
 
   const createTwoButtonAlert = () =>
     Alert.alert('You are deleting an item', 'Do you want to delet it', [
@@ -72,7 +96,7 @@ export default function Inventory({ navigation }){
     return (
       <Item
         item={item}
-        onPress={()=> navigation.navigate('DisplayItem')}
+        onPress={()=> navigation.navigate('DisplayItem',{itemData:item})}
          backgroundColor={backgroundColor}
         textColor={color}
         del = {createTwoButtonAlert}
@@ -112,12 +136,11 @@ export default function Inventory({ navigation }){
     </View>
     </View >
     <View style={pageStyle.flatlist}>
-    <FlatList
-        data={DATA}
+    { loading && <FlatList
+        data={listStock}
         renderItem={renderItem}
         keyExtractor={item => item.id}
-        extraData={selectedId}
-      />
+      />}
       </View>
 
     </View>
@@ -210,5 +233,29 @@ const pageStyle = StyleSheet.create({
     justifyContent:'space-between',
     paddingRight:10,
     alignItems:'center'
-  }
+  },
+  imageStyle: {
+    resizeMode: "cover",
+    borderRadius: 10,
+    width: "100%",
+    height: "100%",
+  },
 })
+
+// useEffect ( () => {
+//  const unsubscribe = navigation.addListener('focus', ()=> {
+//     let listStockArr = []
+//     async function getData() {
+//     const querySnapshot = await getDocs(collection(db, "stock"));
+//     querySnapshot.forEach((doc) => {
+//         listStockArr.push({...doc.data(), id: doc.id})
+//       console.log(`${doc.id} => ${doc.data()}`);
+//     });
+//     setListStock(listStockArr)
+//     // console.log(listStock)
+// }
+//   getData()
+// setLoading(true)
+// })
+// return unsubscribe
+// }, [navigation])

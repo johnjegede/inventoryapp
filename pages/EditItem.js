@@ -13,12 +13,48 @@ import {
 } from "react-native";
 import PageHeading from "../components/PageHeading";
 import * as ImagePicker from "expo-image-picker";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import {storage, db} from "../firebaseConfig";
+import uuid from "uuid";
+import { collection,doc, updateDoc } from "firebase/firestore"; 
 
-export default function EditItem() {
-  const [image, setImage] = useState(null);
-  const [itemName, onChangeItemName] = useState("");
-  const [amount, onChangeAmount] = useState("");
-  const [note, onChangeNote] = useState("");
+export default function EditItem({route,navigation}) {
+
+    const itemData = route.params.itemData;
+    // console.log(itemData)
+  const [image, setImage] = useState(itemData.imageSrc);
+  const [itemName, onChangeItemName] = useState(itemData.itemName);
+  const [amount, onChangeAmount] = useState(itemData.itemAmount);
+  const [note, onChangeNote] = useState(itemData.itemNote);
+
+  async function uploadImageAsync(uri) {
+    // Why are we using XMLHttpRequest? See:
+    // https://github.com/expo/expo/issues/2402#issuecomment-443726662
+    const blob = await new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.onload = function () {
+        resolve(xhr.response);
+      };
+      xhr.onerror = function (e) {
+        console.log(e);
+        reject(new TypeError("Network request failed"));
+      };
+      xhr.responseType = "blob";
+      xhr.open("GET", uri, true);
+      xhr.send(null);
+    });
+
+    try {
+      const fileRef = ref(storage, `images/image-${uuid.v4()}`);
+      const result = await uploadBytes(fileRef, blob);
+      // We're done with the blob, close and release it
+    //   blob.close();
+      return await getDownloadURL(fileRef);
+    } catch (error) {
+        console.log(error)
+      alert(`Error: ${error}`);
+    }
+  }
 
   const pickImage = async () => {
     // No permissions request is necessary for launching the image library
@@ -33,8 +69,33 @@ export default function EditItem() {
 
     if (!result.canceled) {
       setImage(result.assets[0].uri);
+      
     }
   };
+
+  const  updateDb = async ()=>{
+    const uploadUrl = await uploadImageAsync(image);
+    setImage(uploadUrl);
+
+    try {
+        console.log(itemData.id)
+         await updateDoc(doc(db, "stock", itemData.id), {
+          imageSrc: image,
+          itemAmount: amount,
+          itemName: itemName,
+          itemNote:note
+        });
+        setImage(null)
+        onChangeAmount('')
+        onChangeItemName('')
+        onChangeNote('')
+        // console.log("Document written with ID: ", docRef.id);
+        alert(`Item saved successfully`);
+      } catch (e) {
+        console.error("Error adding document: ", e);
+      }
+      navigation.navigate('Inventory');
+  }
 
   return (
     <View style={pageStyle.container}>
@@ -80,7 +141,7 @@ export default function EditItem() {
               onChangeText={onChangeNote}
             />
 
-            <Button color="blue" title="Save Item" />
+            <Button onPress={updateDb} color="blue" title="Save Item" />
           </View>
         </ScrollView>
       </KeyboardAvoidingView>

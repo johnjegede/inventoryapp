@@ -1,6 +1,5 @@
 import React,{useState} from 'react';
 import {View, Text, StyleSheet,Pressable,TextInput,Button } from 'react-native';
-import { HeaderBackButton } from '@react-navigation/stack';
 
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';

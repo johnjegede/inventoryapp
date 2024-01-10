@@ -10,8 +10,12 @@ import {
 } from "react-native";
 import PageHeading from "../components/PageHeading";
 
-export default function DisplayItem({ navigation }) {
+export default function DisplayItem({ navigation, route }) {
   // const [delVal, setDelVal] = useState(false)
+const itemData = route.params.itemData;
+// console.log(itemData)
+ 
+
   let delVal = false;
   const changeVal = () => {
     console.log("Cancel Pressed");
@@ -41,20 +45,20 @@ export default function DisplayItem({ navigation }) {
 
   return (
     <View style={pageStyle.container}>
-      <PageHeading name="Display Item" edit={true} navigation={navigation} />
+      <PageHeading name="Display Item" edit={true} navigation={navigation} itemDetails={itemData} />
       <View style={pageStyle.imgContainer}>
-        <Image style={pageStyle.imageStyle} src="" />
+        <Image style={pageStyle.imageStyle} source={{uri: itemData.imageSrc}} />
       </View>
 
       <View style={pageStyle.container1}>
         <Text style={pageStyle.text}>Name of Item</Text>
-        <Text style={pageStyle.input}> </Text>
+        <Text style={pageStyle.input}> {itemData.itemName}  </Text>
 
         <Text style={pageStyle.text}>Amount</Text>
-        <Text style={pageStyle.input}></Text>
+        <Text style={pageStyle.input}>{itemData.itemAmount}</Text>
 
         <Text style={pageStyle.text}>Note</Text>
-        <Text style={pageStyle.messageInput}></Text>
+        <Text style={pageStyle.messageInput}>{itemData.itemNote}</Text>
 
         <Button
           color="red"

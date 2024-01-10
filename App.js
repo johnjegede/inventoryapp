@@ -33,7 +33,7 @@ export default function App() {
           ),
           headerShown:true
         }}/>
-     <Tab.Screen name="Inventory" component={StackNav} 
+     <Tab.Screen name="Inventor" component={StackNav} 
      options={{
           tabBarLabel: 'Inventory',
           tabBarIcon: ({ color, size }) => (
