@@ -94,7 +94,7 @@ export default function AddItem() {
   };
   return (
     <View style={pageStyle.container}>
-      <PageHeading name="Add New Item" />
+      {/* <PageHeading name="Add New Item" /> */}
       <KeyboardAvoidingView
         style={pageStyle.container1}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -106,7 +106,7 @@ export default function AddItem() {
             )}
           </View>
 
-          <View style={{ flex: 0.4 }}>
+          <View style={{ flex: 1 }}>
             <Pressable style={pageStyle.button} onPress={pickImage}>
               <Text style={pageStyle.text}>
                 {" "}
@@ -148,9 +148,11 @@ export default function AddItem() {
 const pageStyle = StyleSheet.create({
   container: {
     flex: 1,
+
   },
   container1: {
     flex: 1,
+
   },
 
   imgContainer: {
@@ -162,6 +164,7 @@ const pageStyle = StyleSheet.create({
     marginVertical: 20,
     // paddingVertical:"0%",
     height: 220,
+    borderColor:'blue'
   },
   imageStyle: {
     resizeMode: "cover",

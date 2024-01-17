@@ -25,7 +25,7 @@ export default function App() {
       screenOptions={{
         tabBarActiveTintColor: '#e91e63',
       }}>
-     <Tab.Screen name="Dashboard" component={Dashboard}
+     <Tab.Screen name="Dashboard" component={Dashboard} //Dashboard
      options={{
           tabBarLabel: 'Dashboard',
           tabBarIcon: ({ color, size }) => (

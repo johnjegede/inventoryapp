@@ -1,26 +1,54 @@
-import * as React from 'react'
+import React,{useEffect, useState} from 'react';
 import {View, Text, StyleSheet,Pressable} from 'react-native';
 import PageHeading from '../components/PageHeading'
+import { useIsFocused } from '@react-navigation/native';
+import {db} from '../firebaseConfig';
+import {collection, getDocs} from 'firebase/firestore'
 
 
 export default function Dashboard({navigation}) {
+
+  const isFocused = useIsFocused();
+  const [listitem, setListitem] = useState([])
+
+  useEffect(()=>{
+    let listItemstock = []
+
+    const getData = async ()=>{
+      const querySnapshot = await getDocs(collection(db,'stock'));
+      querySnapshot.forEach((doc) =>{
+        listItemstock.push({...doc.data(), id: doc.id})
+      })
+      // console.log(listItemstock)
+      setListitem(listItemstock)
+    }
+    isFocused && getData()
+
+
+  },[isFocused])
+
+  const total =listitem.length
+  const inStock = listitem.filter((value)=> {
+    return parseInt(value.itemAmount) > 0}).length
+  // console.log(inStock)
+  const outStock = listitem.filter((value)=> parseInt(value.itemAmount) <= 0).length
 
   return(
     <View style={pageStyle.container}>
       {/* <PageHeading name="Dashboard" edit={false}/> */}
         <View style= {pageStyle.listInven}>
         <Text style={pageStyle.textItem}> Number of Inventory items </Text>
-        <Text style={pageStyle.textNum}> 20 </Text>
+        <Text style={pageStyle.textNum}> {total} </Text>
         </View>
 
       <View style= {pageStyle.list2}>
         <Pressable style= {pageStyle.listStock}>
         <Text style={[pageStyle.textItem,{color:'green'}]} >In Stock</Text>
-        <Text style={pageStyle.textNum}>18</Text>
+        <Text style={pageStyle.textNum}>{inStock}</Text>
         </Pressable>
         <Pressable style= {pageStyle.listStock}>
         <Text style={[pageStyle.textItem,{color:'red'}]} >Out Of Stock</Text>
-        <Text style={pageStyle.textNum}>2</Text>
+        <Text style={pageStyle.textNum}>{outStock}</Text>
         </Pressable>
       </View>
       <Pressable onPress={()=>navigation.navigate('AddItem')}

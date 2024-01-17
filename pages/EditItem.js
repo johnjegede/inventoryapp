@@ -127,6 +127,7 @@ export default function EditItem({route,navigation}) {
               <Image source={{ uri: image }} style={pageStyle.imageStyle} />
             )}
           </View>
+          <View style={{ flex: 1 }}>
           <Pressable style={pageStyle.button} onPress={pickImage}>
             <Text style={pageStyle.text}>
               {" "}
@@ -147,7 +148,7 @@ export default function EditItem({route,navigation}) {
             keyboardType={"numeric"}
             onChangeText={onChangeAmount}
           />
-          <View style={{ height: "30%" }}>
+          
             <TextInput
               style={pageStyle.messageInput}
               editable

@@ -3,6 +3,7 @@ import {
   View,
   Text,
   StyleSheet,
+  ScrollView,
   Pressable,
   Platform,
   Image,
@@ -76,6 +77,7 @@ const deleteDocu = async ()=>{
 
   return (
     <View style={pageStyle.container}>
+      <ScrollView>
       <PageHeading name="Display Item" edit={true} navigation={navigation} itemDetails={itemData} />
       <View style={pageStyle.imgContainer}>
         <Image style={pageStyle.imageStyle} source={{uri: itemData.imageSrc}} />
@@ -97,6 +99,7 @@ const deleteDocu = async ()=>{
           onPress={Platform.OS === "ios" ? createTwoButtonAlert : windowsAlert}
         ></Button>
       </View>
+      </ScrollView>
     </View>
   );
 }
