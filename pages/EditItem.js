@@ -13,7 +13,7 @@ import {
 } from "react-native";
 import PageHeading from "../components/PageHeading";
 import * as ImagePicker from "expo-image-picker";
-import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { getStorage,deleteObject , ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import {storage, db} from "../firebaseConfig";
 import uuid from "uuid";
 import { collection,doc, updateDoc } from "firebase/firestore"; 
@@ -26,6 +26,7 @@ export default function EditItem({route,navigation}) {
   const [itemName, onChangeItemName] = useState(itemData.itemName);
   const [amount, onChangeAmount] = useState(itemData.itemAmount);
   const [note, onChangeNote] = useState(itemData.itemNote);
+  const prvImage = itemData.imageSrc
 
   async function uploadImageAsync(uri) {
     // Why are we using XMLHttpRequest? See:
@@ -45,7 +46,7 @@ export default function EditItem({route,navigation}) {
     });
 
     try {
-      const fileRef = ref(storage, `images/image-${uuid.v4()}`);
+      const fileRef = ref(storage, `images/image-${Date.now()}`);
       const result = await uploadBytes(fileRef, blob);
       // We're done with the blob, close and release it
     //   blob.close();
@@ -58,6 +59,7 @@ export default function EditItem({route,navigation}) {
 
   const pickImage = async () => {
     // No permissions request is necessary for launching the image library
+    
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
       allowsEditing: true,
@@ -74,6 +76,17 @@ export default function EditItem({route,navigation}) {
   };
 
   const  updateDb = async ()=>{
+    // const storage = getStorage();
+    const deleteRef = ref(storage, prvImage);
+    console.log(deleteRef)
+      await deleteObject(deleteRef).then(() => {
+        // File deleted successfully
+        console.log("file deleted")
+      }).catch((error) => {
+        // Uh-oh, an error occurred!
+        console.log(error)
+      });
+
     const uploadUrl = await uploadImageAsync(image);
     setImage(uploadUrl);
 
@@ -94,6 +107,10 @@ export default function EditItem({route,navigation}) {
       } catch (e) {
         console.error("Error adding document: ", e);
       }
+
+   
+     
+
       navigation.navigate('Inventory');
   }
 

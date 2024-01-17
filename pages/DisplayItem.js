@@ -4,29 +4,49 @@ import {
   Text,
   StyleSheet,
   Pressable,
+  Platform,
   Image,
   Button,
   Alert,
 } from "react-native";
+import {collection,doc,deleteDoc,} from 'firebase/firestore';
+import { getStorage, ref, uploadBytes, getDownloadURL,deleteObject } from "firebase/storage";
+import {storage, db} from "../firebaseConfig";
 import PageHeading from "../components/PageHeading";
 
 export default function DisplayItem({ navigation, route }) {
   // const [delVal, setDelVal] = useState(false)
 const itemData = route.params.itemData;
-// console.log(itemData)
+ console.log(itemData)
+ const prvImage = itemData.imageSrc
  
 
-  let delVal = false;
+const deleteDocu = async ()=>{
+    await deleteDoc(doc(db, 'stock', itemData.id));
+    // const storage = getStorage();
+    const deleteRef = ref(storage, prvImage);
+    console.log(deleteRef)
+      await deleteObject(deleteRef).then(() => {
+        // File deleted successfully
+      }).catch((error) => {
+        // Uh-oh, an error occurred!
+        console.log(error)
+      });
+
+    
+        // let imageRef = storage.refFromURL(prvImage);
+        // console.log("imageref: ",imageRef)
+    //    imageRef.delete()
+      navigation.navigate('Inventory');
+}
+
   const changeVal = () => {
     console.log("Cancel Pressed");
-    delVal = false;
-    console.log(delVal);
   };
 
   const changeOk = () => {
     console.log("Ok Pressed");
-    delVal = true;
-    console.log(delVal);
+    deleteDocu()
   };
 
   const createTwoButtonAlert = () => {
@@ -42,6 +62,17 @@ const itemData = route.params.itemData;
       },
     ]);
   };
+
+  const windowsAlert = () =>{
+    const delValu = confirm("Do you want to delete an item");
+    if (delValu == true) {
+        alert("You pressed OK!");
+        deleteDocu()
+    }
+    else {
+        alert("You pressed Cancel!");
+    }
+  }
 
   return (
     <View style={pageStyle.container}>
@@ -63,7 +94,7 @@ const itemData = route.params.itemData;
         <Button
           color="red"
           title="Delete"
-          onPress={createTwoButtonAlert}
+          onPress={Platform.OS === "ios" ? createTwoButtonAlert : windowsAlert}
         ></Button>
       </View>
     </View>

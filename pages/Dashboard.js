@@ -7,7 +7,7 @@ export default function Dashboard({navigation}) {
 
   return(
     <View style={pageStyle.container}>
-      <PageHeading name="Dashboard" edit={false}/>
+      {/* <PageHeading name="Dashboard" edit={false}/> */}
         <View style= {pageStyle.listInven}>
         <Text style={pageStyle.textItem}> Number of Inventory items </Text>
         <Text style={pageStyle.textNum}> 20 </Text>

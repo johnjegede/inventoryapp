@@ -124,7 +124,7 @@ const Item = ({item, onPress, backgroundColor, textColor, del}) => (
   }
   return (
     <View style={pageStyle.container}>
-    <PageHeading name='Inventory' search={true}/>
+    <PageHeading  search={true}/>
 
     <View style={pageStyle.view}>
     <View style={pageStyle.buttons}>

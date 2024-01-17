@@ -14,10 +14,9 @@ import {
 import PageHeading from "../components/PageHeading";
 import * as ImagePicker from "expo-image-picker";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { getApps, initializeApp } from "firebase/app";
-import {storage, db} from "../firebaseConfig";
+import { storage, db } from "../firebaseConfig";
 import uuid from "uuid";
-import { collection, addDoc } from "firebase/firestore"; 
+import { collection, addDoc } from "firebase/firestore";
 
 export default function AddItem() {
   const [image, setImage] = useState(null);
@@ -37,10 +36,10 @@ export default function AddItem() {
     console.log(result);
 
     if (!result.canceled) {
-    //   setImage(result.assets[0].uri);
+      //   setImage(result.assets[0].uri);
       const uploadUrl = await uploadImageAsync(result.assets[0].uri);
       setImage(uploadUrl);
-      console.log(uploadUrl)
+      console.log(uploadUrl);
     } else {
       setImage(null);
     }
@@ -64,35 +63,35 @@ export default function AddItem() {
     });
 
     try {
-      const fileRef = ref(storage, `images/image-${uuid.v4()}`);
+      const fileRef = ref(storage, `images/image-${Date.now()}`);
       const result = await uploadBytes(fileRef, blob);
       // We're done with the blob, close and release it
-    //   blob.close();
+      //   blob.close();
       return await getDownloadURL(fileRef);
     } catch (error) {
-        console.log(error)
+      console.log(error);
       alert(`Error: ${error}`);
     }
   }
 
-  const  addtoDb = async ()=>{
+  const addtoDb = async () => {
     try {
-        const docRef = await addDoc(collection(db, "stock"), {
-          imageSrc: image,
-          itemAmount: amount,
-          itemName: itemName,
-          itemNote:note
-        });
-        setImage(null)
-        onChangeAmount('')
-        onChangeItemName('')
-        onChangeNote('')
-        console.log("Document written with ID: ", docRef.id);
-        alert(`Item saved successfully`);
-      } catch (e) {
-        console.error("Error adding document: ", e);
-      }
-  }
+      const docRef = await addDoc(collection(db, "stock"), {
+        imageSrc: image,
+        itemAmount: amount,
+        itemName: itemName,
+        itemNote: note,
+      });
+      setImage(null);
+      onChangeAmount("");
+      onChangeItemName("");
+      onChangeNote("");
+      console.log("Document written with ID: ", docRef.id);
+      alert(`Item saved successfully`);
+    } catch (e) {
+      console.error("Error adding document: ", e);
+    }
+  };
   return (
     <View style={pageStyle.container}>
       <PageHeading name="Add New Item" />
