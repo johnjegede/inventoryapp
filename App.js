@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View, Pressable } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
@@ -13,7 +13,7 @@ import DisplayItem from './pages/DisplayItem'
 import EditItem from './pages/EditItem'
 import Inventory from './pages/Inventory'
 import { InventoryTabNav, ScheduleStackNav} from './pages/StackNav'
-import Facilites from './pages/facilities';
+// import Facilites from './pages/facilities';
 
 
 
@@ -21,7 +21,26 @@ const Tab = createBottomTabNavigator()
 const Stack = createStackNavigator()
 
 
+function Facilites({ navigation }) {
+  return (
+    <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+      <Text>This is the Home screen</Text>
+      <View style={{borderWidth:2, padding:10, margin: 10}}>
+        <Pressable onPress={() => navigation.navigate("Invent")}>
+          <Text>Go to Inventory </Text>
+        </Pressable>
+      </View>
 
+      <View style={{borderWidth:2, padding:10, margin: 10}}>
+        <Pressable
+          onPress={() => navigation.navigate('Schedul')}
+        >
+          <Text>Go to Schedule </Text>
+        </Pressable>
+      </View>
+    </View>
+  );
+}
 
 
 
@@ -30,9 +49,10 @@ export default function App() {
 
     <NavigationContainer>
       <Stack.Navigator>
-        <Stack.Screen name="Home" component={Facilites} />
+        <Stack.Screen name="Home" component={Facilites} /> 
         <Stack.Screen name="Invent" component={InventoryTabNav} />
         <Stack.Screen name="Schedul" component={ScheduleStackNav} />
+        
       </Stack.Navigator>
     </NavigationContainer>
     

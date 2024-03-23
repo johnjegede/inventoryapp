@@ -1,6 +1,5 @@
+import React from "react";
 import { View, Text, SafeAreaView, StyleSheet, Pressable } from "react-native";
-import { createStackNavigator } from "@react-navigation/stack";
-import { NavigationContainer } from "@react-navigation/native";
 
 export default function Facilites({ navigation }) {
   return (
