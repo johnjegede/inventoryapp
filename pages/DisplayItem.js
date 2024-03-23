@@ -9,17 +9,19 @@ import {
   Image,
   Button,
   Alert,
+  KeyboardAvoidingView,
 } from "react-native";
 import {collection,doc,deleteDoc,} from 'firebase/firestore';
 import { getStorage, ref, uploadBytes, getDownloadURL,deleteObject } from "firebase/storage";
 import {storage, db} from "../firebaseConfig";
 import PageHeading from "../components/PageHeading";
+import { MaterialIcons } from '@expo/vector-icons';
 
 export default function DisplayItem({ navigation, route }) {
   // const [delVal, setDelVal] = useState(false)
 const itemData = route.params.itemData;
  console.log(itemData)
- const prvImage = itemData.imageSrc
+ const prvImage = itemData.imageName
  
 
 const deleteDocu = async ()=>{
@@ -77,8 +79,13 @@ const deleteDocu = async ()=>{
 
   return (
     <View style={pageStyle.container}>
-      <ScrollView>
-      <PageHeading name="Display Item" edit={true} navigation={navigation} itemDetails={itemData} />
+      
+      <PageHeading  edit={true} navigation={navigation} itemDetails={itemData} />
+      <KeyboardAvoidingView
+        style={pageStyle.container1}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+      >
+      <ScrollView keyboardDismissMode="on-drag">
       <View style={pageStyle.imgContainer}>
         <Image style={pageStyle.imageStyle} source={{uri: itemData.imageSrc}} />
       </View>
@@ -88,54 +95,77 @@ const deleteDocu = async ()=>{
         <Text style={pageStyle.input}> {itemData.itemName}  </Text>
 
         <Text style={pageStyle.text}>Amount</Text>
-        <Text style={pageStyle.input}>{itemData.itemAmount}</Text>
+        <Text style={pageStyle.input1}>{itemData.itemAmount}</Text>
 
         <Text style={pageStyle.text}>Note</Text>
         <Text style={pageStyle.messageInput}>{itemData.itemNote}</Text>
-
-        <Button
-          color="red"
-          title="Delete"
-          onPress={Platform.OS === "ios" ? createTwoButtonAlert : windowsAlert}
-        ></Button>
       </View>
+
+        <View
+        style={{
+          justifyContent: "center",
+          alignItems: "center",
+          marginBottom: 10,
+        }}
+      >
+        <Pressable 
+          style={pageStyle.logButton}         
+          onPress={Platform.OS === "ios" ? createTwoButtonAlert : windowsAlert}
+        >
+          <MaterialIcons name="delete" size={24} color="black" />
+          <Text style={pageStyle.logText}>Delete</Text>
+        </Pressable>
+      </View>
+      
       </ScrollView>
+      </KeyboardAvoidingView>
     </View>
   );
 }
 
 const pageStyle = StyleSheet.create({
   container: {
-    flex: 1,
+    flex: 0.9,
+    // borderWidth:2,
   },
+
   container1: {
-    flex: 1,
+    flex:1,
   },
 
   imgContainer: {
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "red",
-    borderWidth: 2,
+    // backgroundColor: "red",
     marginHorizontal: 20,
     borderRadius: 20,
-    marginVertical: 20,
+    marginVertical: 10,
+    // flex:0.6,
     height: 220,
-    //  flex:0.4,
   },
   imageStyle: {
     resizeMode: "cover",
     borderRadius: 20,
-    width: "100%",
+    width: "50%",
     height: "100%",
+    borderWidth: 2,
   },
   input: {
+    // height: 40,
+    margin: 12,
+    borderWidth: 2,
+    borderRadius: 10,
+    padding: 10,
+    fontSize: 16,
+  },
+  input1: {
     height: 40,
     margin: 12,
     borderWidth: 2,
     borderRadius: 10,
     padding: 10,
     fontSize: 16,
+    width:"40%"
   },
   messageInput: {
     height: 80,
@@ -150,5 +180,20 @@ const pageStyle = StyleSheet.create({
     fontWeight: "bold",
     textAlign: "left",
     marginHorizontal: 12,
+  },
+  logButton: {
+    borderWidth: 2,
+    padding: 5,
+    borderRadius: 25,
+    alignItems: "center",
+    justifyContent: "space-evenly",
+    marginHorizontal: 0,
+    flexDirection: "row",
+    backgroundColor: "#FF5D5D",
+    width: "40%",
+  },
+  logText: {
+    fontSize: 16,
+    fontWeight: "600",
   },
 });

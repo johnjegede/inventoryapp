@@ -5,52 +5,35 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { MaterialIcons } from '@expo/vector-icons'; 
+import { createStackNavigator } from "@react-navigation/stack"
 // import AssetExample from './components/AssetExample';
 import Dashboard from './pages/Dashboard'
 import AddItem from './pages/AddItem'
 import DisplayItem from './pages/DisplayItem'
 import EditItem from './pages/EditItem'
 import Inventory from './pages/Inventory'
-import StackNav from './pages/StackNav'
+import { InventoryTabNav, ScheduleStackNav} from './pages/StackNav'
+import Facilites from './pages/facilities';
+
 
 
 const Tab = createBottomTabNavigator()
+const Stack = createStackNavigator()
+
+
+
+
+
 
 export default function App() {
   return (
 
     <NavigationContainer>
-    <Tab.Navigator 
-    // initialRouteName="Dashboard"
-      screenOptions={{
-        tabBarActiveTintColor: '#e91e63',
-      }}>
-     <Tab.Screen name="Dashboard" component={Dashboard} //Dashboard
-     options={{
-          tabBarLabel: 'Dashboard',
-          tabBarIcon: ({ color, size }) => (
-            <MaterialIcons name="dashboard" color={color} size={size} />
-          ),
-          headerShown:true
-        }}/>
-     <Tab.Screen name="Inventor" component={StackNav} 
-     options={{
-          tabBarLabel: 'Inventory',
-          tabBarIcon: ({ color, size }) => (
-            <MaterialIcons name="inventory" color={color} size={size}  />
-          ),
-          headerShown:false
-        }}/>
-     <Tab.Screen name="AddItem"  component={AddItem}
-     options={{
-          tabBarLabel: 'AddItem',
-          tabBarIcon: ({ color, size }) => (
-            <MaterialIcons name="add-circle-outline" color={color} size={size} />
-          ),
-          headerShown:true
-        }}/>
-    
-    </Tab.Navigator>
+      <Stack.Navigator>
+        <Stack.Screen name="Home" component={Facilites} />
+        <Stack.Screen name="Invent" component={InventoryTabNav} />
+        <Stack.Screen name="Schedul" component={ScheduleStackNav} />
+      </Stack.Navigator>
     </NavigationContainer>
     
   );

@@ -4,6 +4,7 @@ import PageHeading from '../components/PageHeading'
 import { useIsFocused } from '@react-navigation/native';
 import {db} from '../firebaseConfig';
 import {collection, getDocs} from 'firebase/firestore'
+import { MaterialIcons } from '@expo/vector-icons';
 
 
 export default function Dashboard({navigation}) {
@@ -37,7 +38,7 @@ export default function Dashboard({navigation}) {
     <View style={pageStyle.container}>
       {/* <PageHeading name="Dashboard" edit={false}/> */}
         <View style= {pageStyle.listInven}>
-        <Text style={pageStyle.textItem}> Number of Inventory items </Text>
+        <Text style={pageStyle.textItem}> Number of items in Inventory that we have</Text>
         <Text style={pageStyle.textNum}> {total} </Text>
         </View>
 
@@ -53,6 +54,7 @@ export default function Dashboard({navigation}) {
       </View>
       <Pressable onPress={()=>navigation.navigate('AddItem')}
        style={pageStyle.button1}>
+        <MaterialIcons name="add-circle" size={30} color="black" />
         <Text style={pageStyle.textAdd}>Add an item</Text>
       </Pressable>
     </View>
@@ -106,17 +108,20 @@ const pageStyle = StyleSheet.create({
    textAdd:{
     fontSize:20,
     textAlign:'center',
+    paddingLeft:10,
   },
   button1: {
     alignItems: "center",
     justifyContent: "center",
-    padding: 10,
-    marginHorizontal: 60,
-    marginVertical: 40,
+    padding: 5,
+    margin: 'auto',
+    width: "50%",
+    // marginVertical: 40,
     borderRadius: 40,
     borderWidth: 2,
     borderColor: 'black',
     elevation: 5,
+    flexDirection:"row"
 
   },
 })

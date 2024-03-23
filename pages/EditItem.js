@@ -13,22 +13,29 @@ import {
 } from "react-native";
 import PageHeading from "../components/PageHeading";
 import * as ImagePicker from "expo-image-picker";
-import { getStorage,deleteObject , ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { getStorage,deleteObject , ref, uploadBytes, getDownloadURL, uploadBytesResumable } from "firebase/storage";
 import {storage, db} from "../firebaseConfig";
 import uuid from "uuid";
 import { collection,doc, updateDoc } from "firebase/firestore"; 
+import NumInput from "../components/NumInput";
+import { MaterialIcons } from '@expo/vector-icons';
+
+var imgName = `images/image-${Date.now()}`
 
 export default function EditItem({route,navigation}) {
 
     const itemData = route.params.itemData;
     // console.log(itemData)
   const [image, setImage] = useState(itemData.imageSrc);
+  const [changeImage, setChangeImage] = useState(false);
+  const [imageName, setImageName] = useState(itemData.imageName);
   const [itemName, onChangeItemName] = useState(itemData.itemName);
   const [amount, onChangeAmount] = useState(itemData.itemAmount);
   const [note, onChangeNote] = useState(itemData.itemNote);
-  const prvImage = itemData.imageSrc
+  const prvImage = itemData.imageName
 
   async function uploadImageAsync(uri) {
+
     // Why are we using XMLHttpRequest? See:
     // https://github.com/expo/expo/issues/2402#issuecomment-443726662
     const blob = await new Promise((resolve, reject) => {
@@ -46,13 +53,15 @@ export default function EditItem({route,navigation}) {
     });
 
     try {
-      const fileRef = ref(storage, `images/image-${Date.now()}`);
+      // imgName = `images/image-${Date.now()}`
+      console.log("imageName",imageName)
+      const fileRef = ref(storage, imageName);
       const result = await uploadBytes(fileRef, blob);
       // We're done with the blob, close and release it
     //   blob.close();
       return await getDownloadURL(fileRef);
     } catch (error) {
-        console.log(error)
+        // console.log(error)
       alert(`Error: ${error}`);
     }
   }
@@ -67,18 +76,27 @@ export default function EditItem({route,navigation}) {
       quality: 1,
     });
 
-    console.log(result);
+    // console.log(result);
 
     if (!result.canceled) {
       setImage(result.assets[0].uri);
+      setImageName(`images/image-${Date.now()}`)
+      setChangeImage(true)
       
     }
   };
 
   const  updateDb = async ()=>{
-    // const storage = getStorage();
+
+
+    console.log("imageName",imageName)
+    if(changeImage){
+      var uploadUrl = await uploadImageAsync(image);
+       // setImage(uploadUrl);
+      //  console.log("uploadUrl",uploadUrl)
+    console.log(prvImage)
     const deleteRef = ref(storage, prvImage);
-    console.log(deleteRef)
+    // console.log(deleteRef)
       await deleteObject(deleteRef).then(() => {
         // File deleted successfully
         console.log("file deleted")
@@ -86,14 +104,17 @@ export default function EditItem({route,navigation}) {
         // Uh-oh, an error occurred!
         console.log(error)
       });
-
-    const uploadUrl = await uploadImageAsync(image);
-    setImage(uploadUrl);
+    }else{
+      var uploadUrl = image;
+    }
+    
+   
 
     try {
         console.log(itemData.id)
          await updateDoc(doc(db, "stock", itemData.id), {
-          imageSrc: image,
+          imageSrc: uploadUrl,
+          imageName: imageName,
           itemAmount: amount,
           itemName: itemName,
           itemNote:note
@@ -108,7 +129,7 @@ export default function EditItem({route,navigation}) {
         console.error("Error adding document: ", e);
       }
 
-   
+    
      
 
       navigation.navigate('Inventory');
@@ -116,18 +137,18 @@ export default function EditItem({route,navigation}) {
 
   return (
     <View style={pageStyle.container}>
-      <PageHeading name="Edit Item" />
+      {/* <PageHeading name="Edit Item" /> */}
       <KeyboardAvoidingView
         style={pageStyle.container1}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
-        <ScrollView keyboardDismissMode="on-drag">
+        <ScrollView  keyboardDismissMode="on-drag">
           <View style={pageStyle.imgContainer}>
             {image && (
               <Image source={{ uri: image }} style={pageStyle.imageStyle} />
             )}
           </View>
-          <View style={{ flex: 1 }}>
+          <View>
           <Pressable style={pageStyle.button} onPress={pickImage}>
             <Text style={pageStyle.text}>
               {" "}
@@ -140,14 +161,14 @@ export default function EditItem({route,navigation}) {
             placeholder={"Item Name"}
             onChangeText={onChangeItemName}
           />
-
-          <TextInput
+           <NumInput count={amount} onChangeCount={onChangeAmount} />
+          {/* <TextInput
             style={pageStyle.input}
             value={amount}
             placeholder={"Amount"}
             keyboardType={"numeric"}
             onChangeText={onChangeAmount}
-          />
+          /> */}
           
             <TextInput
               style={pageStyle.messageInput}
@@ -158,8 +179,19 @@ export default function EditItem({route,navigation}) {
               numberOfLines={4}
               onChangeText={onChangeNote}
             />
-
-            <Button onPress={updateDb} color="blue" title="Save Item" />
+            </View>
+            <View
+        style={{
+          
+          justifyContent: "center",
+          alignItems: "center",
+          marginBottom: 10,
+        }}
+      >
+        <Pressable style={pageStyle.logButton} onPress={updateDb}>
+          <MaterialIcons name="save" size={24} color="black" />
+          <Text style={pageStyle.logText}>Update Item</Text>
+        </Pressable>
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -169,7 +201,8 @@ export default function EditItem({route,navigation}) {
 
 const pageStyle = StyleSheet.create({
   container: {
-    flex: 1,
+    // height:"90%"
+    flex: 0.9,
   },
   container1: {
     flex: 1,
@@ -178,17 +211,18 @@ const pageStyle = StyleSheet.create({
   imgContainer: {
     alignItems: "center",
     justifyContent: "center",
-    borderWidth: 2,
+    
     marginHorizontal: 20,
     borderRadius: 20,
-    marginVertical: 20,
+    marginVertical: 10,
     height: 220,
   },
   imageStyle: {
     resizeMode: "cover",
-    borderRadius: 20,
-    width: "100%",
+    borderRadius: 10,
+    width: "50%",
     height: "100%",
+    borderWidth: 2,
   },
   input: {
     height: 40,
@@ -221,5 +255,20 @@ const pageStyle = StyleSheet.create({
     fontSize: 20,
     fontWeight: "bold",
     textAlign: "center",
+  },
+  logButton: {
+    borderWidth: 2,
+    padding: 5,
+    borderRadius: 25,
+    alignItems: "center",
+    justifyContent: "space-evenly",
+    marginHorizontal: 0,
+    flexDirection: "row",
+    backgroundColor: "#FF5D5D",
+    width: "40%",
+  },
+  logText: {
+    fontSize: 16,
+    fontWeight: "600",
   },
 });

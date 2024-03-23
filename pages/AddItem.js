@@ -17,12 +17,18 @@ import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { storage, db } from "../firebaseConfig";
 import uuid from "uuid";
 import { collection, addDoc } from "firebase/firestore";
+import NumInput from "../components/NumInput";
+import { MaterialIcons } from '@expo/vector-icons';
 
-export default function AddItem() {
+var imgName = `images/image-${Date.now()}`
+
+export default function AddItem({ navigation }) {
   const [image, setImage] = useState(null);
+  // const [imageName, setImageName] = useState(null);
   const [itemName, onChangeItemName] = useState("");
-  const [amount, onChangeAmount] = useState("");
+  const [amount, onChangeAmount] = useState("0");
   const [note, onChangeNote] = useState("");
+ 
 
   const pickImage = async () => {
     // No permissions request is necessary for launching the image library
@@ -36,10 +42,10 @@ export default function AddItem() {
     console.log(result);
 
     if (!result.canceled) {
-      //   setImage(result.assets[0].uri);
-      const uploadUrl = await uploadImageAsync(result.assets[0].uri);
-      setImage(uploadUrl);
-      console.log(uploadUrl);
+        setImage(result.assets[0].uri);
+     
+      // setImage(uploadUrl);
+      // console.log(image);
     } else {
       setImage(null);
     }
@@ -63,7 +69,10 @@ export default function AddItem() {
     });
 
     try {
-      const fileRef = ref(storage, `images/image-${Date.now()}`);
+      
+      // setImageName(imgName)
+      imgName = `images/image-${Date.now()}`
+      const fileRef = ref(storage, imgName);
       const result = await uploadBytes(fileRef, blob);
       // We're done with the blob, close and release it
       //   blob.close();
@@ -76,18 +85,20 @@ export default function AddItem() {
 
   const addtoDb = async () => {
     try {
+      const uploadUrl = await uploadImageAsync(image);
       const docRef = await addDoc(collection(db, "stock"), {
-        imageSrc: image,
+        imageSrc: uploadUrl,
+        imageName: imgName,
         itemAmount: amount,
         itemName: itemName,
         itemNote: note,
       });
       setImage(null);
-      onChangeAmount("");
+      onChangeAmount("0");
       onChangeItemName("");
       onChangeNote("");
-      console.log("Document written with ID: ", docRef.id);
-      alert(`Item saved successfully`);
+      // console.log("Document written with ID: ", docRef.id);
+      alert(`Item saved successfully click on Done to go back`);
     } catch (e) {
       console.error("Error adding document: ", e);
     }
@@ -95,11 +106,14 @@ export default function AddItem() {
   return (
     <View style={pageStyle.container}>
       {/* <PageHeading name="Add New Item" /> */}
+      <Pressable onPress={() => navigation.goBack()} style={pageStyle.button1}>
+        <Text style={pageStyle.text1}> Done </Text>
+      </Pressable>
       <KeyboardAvoidingView
         style={pageStyle.container1}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
-        <ScrollView style={pageStyle.container1} keyboardDismissMode="on-drag">
+        <ScrollView keyboardDismissMode="on-drag">
           <View style={pageStyle.imgContainer}>
             {image && (
               <Image source={{ uri: image }} style={pageStyle.imageStyle} />
@@ -119,14 +133,7 @@ export default function AddItem() {
               placeholder={"Item Name"}
               onChangeText={onChangeItemName}
             />
-
-            <TextInput
-              style={pageStyle.input}
-              value={amount}
-              placeholder={"Amount"}
-              keyboardType={"numeric"}
-              onChangeText={onChangeAmount}
-            />
+            <NumInput count={amount} onChangeCount={onChangeAmount} />
 
             <TextInput
               style={pageStyle.messageInput}
@@ -137,8 +144,22 @@ export default function AddItem() {
               numberOfLines={4}
               onChangeText={onChangeNote}
             />
-            <Button onPress={addtoDb} color="blue" title="Save new Item" />
+            
+           
           </View>
+          <View
+        style={{
+          
+          justifyContent: "center",
+          alignItems: "center",
+          marginBottom: 10,
+        }}
+      >
+        <Pressable style={pageStyle.logButton} onPress={addtoDb}>
+          <MaterialIcons name="save" size={24} color="black" />
+          <Text style={pageStyle.logText}>Save new Item</Text>
+        </Pressable>
+      </View>
         </ScrollView>
       </KeyboardAvoidingView>
     </View>
@@ -147,12 +168,10 @@ export default function AddItem() {
 
 const pageStyle = StyleSheet.create({
   container: {
-    flex: 1,
-
+    flex: 0.9,
   },
   container1: {
     flex: 1,
-
   },
 
   imgContainer: {
@@ -164,12 +183,12 @@ const pageStyle = StyleSheet.create({
     marginVertical: 20,
     // paddingVertical:"0%",
     height: 220,
-    borderColor:'blue'
+    borderColor: "blue",
   },
   imageStyle: {
     resizeMode: "cover",
-    borderRadius: 20,
-    width: "100%",
+    borderRadius: 10,
+    width: "50%",
     height: "100%",
   },
   input: {
@@ -203,5 +222,36 @@ const pageStyle = StyleSheet.create({
     fontSize: 20,
     fontWeight: "bold",
     textAlign: "center",
+  },
+  text1: {
+    fontSize: 20,
+    fontWeight: "bold",
+    textAlign: "center",
+    borderRadius: 10,
+    borderWidth: 2,
+    width: "20%",
+    padding: 1,
+  },
+  button1: {
+    padding: 5,
+    marginHorizontal: 0,
+
+    borderBottomWidth: 2,
+    width: "100%",
+  },
+  logButton: {
+    borderWidth: 2,
+    padding: 5,
+    borderRadius: 25,
+    alignItems: "center",
+    justifyContent: "space-evenly",
+    marginHorizontal: 0,
+    flexDirection: "row",
+    backgroundColor: "#FF5D5D",
+    width: "40%",
+  },
+  logText: {
+    fontSize: 16,
+    fontWeight: "600",
   },
 });

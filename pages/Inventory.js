@@ -5,7 +5,7 @@ import {
   StyleSheet,
   Pressable,
   Image,
-  Button,
+  Platform,
   FlatList,
   TouchableOpacity,
   Alert,
@@ -13,9 +13,10 @@ import {
 import PageHeading from "../components/PageHeading";
 import { Ionicons } from "@expo/vector-icons";
 import { MaterialIcons } from "@expo/vector-icons";
-import { query, collection, onSnapshot, getDocs } from "firebase/firestore";
-import { db } from "../firebaseConfig";
+import { query, collection, onSnapshot, getDocs,doc,deleteDoc, } from "firebase/firestore";
+import { db, storage } from "../firebaseConfig";
 import { useIsFocused } from "@react-navigation/native";
+import { getStorage, ref, uploadBytes, getDownloadURL,deleteObject } from "firebase/storage";
 
 const DATA = [
   {
@@ -24,8 +25,11 @@ const DATA = [
   },
 ];
 
+
+
 export default function Inventory({ navigation }) {
   const [selectedId, setSelectedId] = useState();
+  const [deleted, setDeleted] = useState(false); 
   const [loading, setLoading] = useState(false); // Set loading to true on component mount
   const [listStock, setListStock] = useState([]);
   const [listInStock, setListInStock] = useState([]);
@@ -33,9 +37,62 @@ export default function Inventory({ navigation }) {
   const [istock, setIstock] = useState(true);
   const [ostock, setOstock] = useState(false);
   const [bgColor, setBgColor] = useState('green');
-  let delVal = false;
+  const [searchItem, onChangeSearchItem] = useState("");
+  const [filterData,setfilterData] = useState([]);
   const isFocused = useIsFocused();
-  //   console.log(isFocused)
+  //   console.log(searchItem)
+  const deleteDocu = async (itemData)=>{
+    // console.log("delete",itemData)
+    await deleteDoc(doc(db, 'stock', itemData.id));
+    // const storage = getStorage();
+    const deleteRef = ref(storage, itemData.imageName);
+    console.log(deleteRef)
+      await deleteObject(deleteRef).then(() => {
+        // File deleted successfully
+      }).catch((error) => {
+        // Uh-oh, an error occurred!
+        console.log(error)
+      });
+  
+      setDeleted(true)
+      // navigation.navigate('Inventory');
+  }
+  
+  const changeVal = () => {
+    console.log("Cancel Pressed");
+  };
+  
+  const changeOk = (item) => {
+    console.log("Ok Pressed");
+    deleteDocu(item)
+  };
+  
+  const createTwoButtonAlert = (item) => {
+    Alert.alert("You are deleting an item", "Do you want to delete it", [
+      {
+        text: "Cancel",
+        onPress: changeVal,
+        style: "cancel",
+      },
+      {
+        text: "OK",
+        onPress: changeOk(item),
+      },
+    ]);
+  };
+  
+  const windowsAlert = (item) =>{
+    // console.log(item)
+    const delValu = confirm("Do you want to delete an item");
+    if (delValu == true) {
+        alert("You pressed OK!");
+        deleteDocu(item)
+    }
+    else {
+        alert("You pressed Cancel!");
+    }
+  }
+  
 
   useEffect(() => {
     let listStockArr = [];
@@ -59,22 +116,46 @@ export default function Inventory({ navigation }) {
     }
     isFocused && getData();
     setLoading(true);
-  }, [isFocused]);
+    setDeleted(false)
 
+  }, [isFocused,deleted]);
+
+useEffect (() => {
+  // console.log(searchItem)
+  if(searchItem) {
+    const newData = listStock.filter((item) => {
+      const itemData = item.itemName.toLowerCase()
+      const textData = searchItem.toLowerCase()
+      return itemData.indexOf(textData) > -1
+    })
+    setfilterData(newData) 
+  }else {
+    setfilterData("")
+  }
+  // console.log("filterdata",filterData)
+
+},[searchItem])
+
+
+// const changeSearchitem =(data)=>{
+//   setSearchItem(data)
+
+// }
   // console.log("instock = ", listInStock);
   // console.log("outstock = ", listOutStock);
   // console.log(listStock)
 
-  const Item = ({ item, onPress, backgroundColor, textColor, del }) => (
+  const Item = ({ item, onPress, del }) => (
     <TouchableOpacity
       onPress={onPress}
-      style={[pageStyle.item, { backgroundColor }]}
+      style={pageStyle.item}  //set backgroud color
     >
       <View style={pageStyle.thumb}>
         <Image source={{ uri: item.imageSrc }} style={pageStyle.imageStyle} />
       </View>
       <View style={pageStyle.thumbtext}>
-        <Text style={[pageStyle.title, { color: textColor }]}>
+        <Text style={pageStyle.title} // set text color
+        >   
           {item.itemName}
         </Text>
         <View style={pageStyle.thumbicon}>
@@ -84,7 +165,7 @@ export default function Inventory({ navigation }) {
           >
             {item.itemAmount}
           </Text>
-          <Pressable onPress={del}>
+          <Pressable onPress={()=>del(item)}>
             <MaterialIcons name="delete-forever" size={34} color="black" />
           </Pressable>
         </View>
@@ -92,30 +173,10 @@ export default function Inventory({ navigation }) {
     </TouchableOpacity>
   );
 
-  const createTwoButtonAlert = () =>
-    Alert.alert("You are deleting an item", "Do you want to delet it", [
-      {
-        text: "Cancel",
-        onPress: () => {
-          console.log("Cancel Pressed");
-          delVal = false;
-          console.log(delVal);
-        },
-        style: "cancel",
-      },
-      {
-        text: "OK",
-        onPress: () => {
-          delVal = true;
-          console.log("OK Presse");
-          console.log(delVal);
-        },
-      },
-    ]);
 
   const renderItem = ({ item }) => {
-    const backgroundColor = item.id === selectedId ? "#6e3b6e" : "#f9c2ff";
-    const color = item.id === selectedId ? "white" : "black";
+    const backgroundColor =  "#f9c2ff";
+    const color = "black";
 
     return (
       <Item
@@ -123,7 +184,7 @@ export default function Inventory({ navigation }) {
         onPress={() => navigation.navigate("DisplayItem", { itemData: item })}
         backgroundColor={backgroundColor}
         textColor={color}
-        del={createTwoButtonAlert}
+        del={Platform.OS === "ios" ? createTwoButtonAlert : windowsAlert}
       />
     );
   };
@@ -145,7 +206,7 @@ export default function Inventory({ navigation }) {
   };
   return (
     <View style={pageStyle.container}>
-      <PageHeading search={true} />
+      <PageHeading edit={false} searchItem={searchItem} setSearchItem={onChangeSearchItem} search={true} />
 
       <View style={pageStyle.view}>
         <View style={pageStyle.buttons}>
@@ -179,9 +240,10 @@ export default function Inventory({ navigation }) {
       <View style={pageStyle.flatlist}>
         {loading && (
           <FlatList
-            data={istock ? listInStock : listOutStock} //listStock  istock ? listInStock : listOutStock
+            data={filterData.length != 0 ? filterData : istock ? listInStock : listOutStock} //listStock  istock ? listInStock : listOutStock
             renderItem={renderItem}
             keyExtractor={(item) => item.id}
+            extraData={selectedId}
           />
         )}
       </View>
@@ -191,7 +253,8 @@ export default function Inventory({ navigation }) {
 
 const pageStyle = StyleSheet.create({
   container: {
-    flex: 1,
+    height:"90%"
+    // paddingBottom:60,
   },
   view: {
     flexDirection: "row",
