@@ -82,15 +82,18 @@ export default function LoginPage({navigation}) {
       <Pressable style={pageStyle.pressInner} onPress={()=> navigation.navigate('Register')}>
       <Text style={pageStyle.textInner}> Register</Text>
       </Pressable>
-      <Text style={pageStyle.textOuter}> or go back to </Text>
-      <Pressable style={pageStyle.pressInner} onPress={()=> navigation.navigate('Main')}>
-      <Text style={pageStyle.textInner}>Main Page</Text>
-      </Pressable>
       </View>
 
       <Pressable  style={pageStyle.pressable} onPress={()=> signIn()}> 
       <Text style={pageStyle.presstext}>Login</Text>
       </Pressable>
+
+      <View style={pageStyle.viewReg} >
+      <Text style={pageStyle.textOuter}> Go back to </Text>
+      <Pressable style={pageStyle.pressInner} onPress={()=> navigation.navigate('Main')}>
+      <Text style={pageStyle.textInner}>Main Page</Text>
+      </Pressable>
+      </View>
     </View>
       
     </SafeAreaView>
@@ -157,8 +160,10 @@ const pageStyle = StyleSheet.create({
    
   },
   errorTxt:{
-    fontSize:12,
+    fontSize:14,
     color:"#FF0D10",
+    fontWeight:"600",
+    textAlign:"center"
   },
 
 });

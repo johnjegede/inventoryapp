@@ -27,12 +27,12 @@ export default function Profile({ navigation }) {
       if (user) {
         const uid = user.uid;
         useUserVal(uid);
-        console.log("user logged in", user.uid);
+        // console.log("user logged in", user.uid);
         const docRef = doc(db, "users", user.uid);
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
           useUserDetails(docSnap.data());
-          console.log("Document data:", docSnap.data());
+          // console.log("Document data:", docSnap.data());
         } else {
           console.log("No such document!");
         }

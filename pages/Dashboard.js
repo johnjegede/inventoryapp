@@ -39,7 +39,7 @@ export default function Dashboard({navigation}) {
     <View style={pageStyle.container}>
       {/* <PageHeading name="Dashboard" edit={false}/> */}
         <View style= {pageStyle.listInven}>
-        <Text style={pageStyle.textItem}> Number of items in Inventory that we have</Text>
+        <Text style={pageStyle.textItem}> Number of items in Inventory</Text>
         <Text style={pageStyle.textNum}> {total} </Text>
         </View>
 
@@ -61,7 +61,7 @@ export default function Dashboard({navigation}) {
       <Pressable onPress={()=>navigation.navigate('Main')}
        style={pageStyle.button1}>
         <Ionicons name="chevron-back-circle" size={24} color="black" />
-        <Text style={pageStyle.textAdd}>Go back to Main page</Text>
+        <Text style={pageStyle.textAdd}>Back to Main</Text>
       </Pressable>
     </View>
 
