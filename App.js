@@ -13,7 +13,7 @@ import DisplayItem from './pages/DisplayItem'
 import EditItem from './pages/EditItem'
 import Inventory from './pages/Inventory'
 import { InventoryTabNav, ScheduleStackNav} from './pages/StackNav'
-// import Facilites from './pages/facilities';
+// import Facilites from './pages/Facilities';
 
 
 
@@ -49,9 +49,9 @@ export default function App() {
 
     <NavigationContainer>
       <Stack.Navigator>
-        <Stack.Screen name="Home" component={Facilites} /> 
-        <Stack.Screen name="Invent" component={InventoryTabNav} />
-        <Stack.Screen name="Schedul" component={ScheduleStackNav} />
+        <Stack.Screen name="Main" component={Facilites} /> 
+        <Stack.Screen name="Invent" component={InventoryTabNav}  options={{ headerShown: false }}/>
+        <Stack.Screen name="Schedul" component={ScheduleStackNav} options={{ headerShown: false }}/>
         
       </Stack.Navigator>
     </NavigationContainer>

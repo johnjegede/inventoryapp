@@ -16,6 +16,9 @@ import { FontAwesome } from "@expo/vector-icons";
 import { FontAwesome5 } from "@expo/vector-icons";
 
 const windowWidth = Dimensions.get("window").width;
+moment.updateLocale("en", { week: {
+  dow: 0, // First day of week is Sunday
+}});
 
 const MainDate = ({
   date,

@@ -94,7 +94,7 @@ const pageStyle = StyleSheet.create({
   },
 
   textHeader:{
-    font:16,
+    fontSize:16,
     fontWeight:'bold'
   },
   notes:{

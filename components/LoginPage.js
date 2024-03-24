@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import { Text, SafeAreaView, StyleSheet,View, TextInput, Image, Pressable} from 'react-native';
 import { authenticate } from '../firebaseConfig';
-import {  signInWithEmailAndPassword, onAuthStateChanged  } from 'firebase/auth'
+import { AuthErrorCodes, signInWithEmailAndPassword, onAuthStateChanged  } from 'firebase/auth'
 
 // You can import supported modules from npm
 // import { Card } from 'react-native-paper';
@@ -11,6 +11,7 @@ export default function LoginPage({navigation}) {
  const[email, onChangeEmail] =  useState('')
  const[password, onChangePassword] =  useState('')
  const auth = authenticate
+ const[errormessage, setErrormessage] =  useState('')
 
 //  useEffect(()=>{
 //   const unsubscribe=  onAuthStateChanged(auth,(user)=>{
@@ -29,17 +30,27 @@ export default function LoginPage({navigation}) {
  const signIn = async() =>{
 
   
-    await signInWithEmailAndPassword(auth,email,password)
+     await signInWithEmailAndPassword(auth,email,password)
     .then((userCredential) => {
       const user = userCredential.user;
-      console.log(user);
+      // console.log(user);
+      onChangeEmail("")
+      onChangePassword("")
       navigation.navigate('HomeScreen')
 
     })
     .catch((error)=>{
       const errorCode = error.code;
-      const errorMessage = error.message;
-      console.log(errorMessage)
+
+      if (
+        error.code === AuthErrorCodes.INVALID_PASSWORD ){
+          setErrormessage("Invalid password");
+        }
+        if (
+          error.code === AuthErrorCodes.INVALID_EMAIL){
+            setErrormessage("Invalid email");
+          }
+      //  console.log(error.message)
     })
   
  }
@@ -51,6 +62,7 @@ export default function LoginPage({navigation}) {
     </View>
     <View style={pageStyle.view}>
       <Text style={pageStyle.text}> Login</Text>
+      {errormessage != "" && (<Text style={pageStyle.errorTxt}> {errormessage}</Text>)}
       <TextInput 
       style={pageStyle.textInput}
       value={email}
@@ -69,6 +81,10 @@ export default function LoginPage({navigation}) {
       </Text>
       <Pressable style={pageStyle.pressInner} onPress={()=> navigation.navigate('Register')}>
       <Text style={pageStyle.textInner}> Register</Text>
+      </Pressable>
+      <Text style={pageStyle.textOuter}> or go back to </Text>
+      <Pressable style={pageStyle.pressInner} onPress={()=> navigation.navigate('Main')}>
+      <Text style={pageStyle.textInner}>Main Page</Text>
       </Pressable>
       </View>
 
@@ -139,6 +155,10 @@ const pageStyle = StyleSheet.create({
    fontSize: 16,
    fontWeight:'600'
    
+  },
+  errorTxt:{
+    fontSize:12,
+    color:"#FF0D10",
   },
 
 });

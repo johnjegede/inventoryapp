@@ -4,6 +4,10 @@ import moment from 'moment'
 import DateVal from './Date'
 const windowWidth = Dimensions.get('window').width;
 
+moment.updateLocale("en", { week: {
+  dow: 0, // First day of week is Sunday
+}});
+
 const month = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 import { Feather } from '@expo/vector-icons';
 

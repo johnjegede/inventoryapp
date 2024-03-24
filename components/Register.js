@@ -1,4 +1,5 @@
-import { Text, SafeAreaView, StyleSheet, StatusBar, View, TextInput, TouchableOpacity, Alert } from 'react-native';
+import React, {useState, useEffect} from 'react';
+import { Text, SafeAreaView, StyleSheet, StatusBar, View, TextInput, TouchableOpacity, Alert, Pressable } from 'react-native';
 import { authenticate, db } from "../firebaseConfig";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
@@ -18,8 +19,8 @@ const SignupSchema= Yup.object().shape({
   .min(8)
   .required("Please enter your password.")
   .matches(
-    /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/, 
-    "Must contain minimum 8 characters, at least one uppercase letter, one number and one special case character"
+    /^(?=.*?[A-Z])(?=.*?[a-z]).{8,}$/, 
+    "Must contain minimum 8 characters, at least one uppercase letter"
   ),
   confirmPassword: Yup.string()
   .min(8, "Confirm password must be 8 characters long.")
@@ -34,13 +35,15 @@ const SignupSchema= Yup.object().shape({
 })
 
 
-export default function App() {
+export default function Register({ navigation }) {
 
+    const auth = authenticate;
     const signUp = async (values) => {
+        // console.log(values)
         await createUserWithEmailAndPassword(auth, values.email, values.password)
           .then(async (userCredential) => {
             const user = userCredential.user;
-            console.log(user.uid);
+            // console.log(user.uid);
             await setDoc(doc(db, "users", user.uid), {
               fullname: values.name,
               email: values.email,
@@ -62,7 +65,6 @@ export default function App() {
       };
 
   return (
-    <View>
     <Formik initialValues={
       {
         name:'',
@@ -71,9 +73,11 @@ export default function App() {
         confirmPassword:'',
       }}
       validationSchema={SignupSchema}
-      onSubmit={values => () => signUp(values)}
+      onSubmit={values => console.log("Values are",values)}
+    //   signUp(values)
       >
-    {({values,errors,touched,handleChange, setFieldTouched, isValid, handleSubmit}) => (
+    {({values,errors,touched,handleChange,handleBlur, setFieldTouched, isValid, handleSubmit}) => (
+        
     <View style={pageStyle.wrapper}>
       <StatusBar barStyle={"light-content"}></StatusBar>
       <View style={pageStyle.formContainer}>
@@ -81,12 +85,13 @@ export default function App() {
       <Text style={pageStyle.textDetails}>
         Please enter your details to register
       </Text>
+      <Text>{isValid}</Text>
 
       <View style={pageStyle.inputWrapper}> 
       <Text style={pageStyle.errorVal}>Name </Text>
       <TextInput style= {pageStyle.inputStyle} placeholder="Enter first name and last name" value={values.name} 
-      autoCapitalize={false}
-      onChangeText={handleChange('name')}
+      autoCapitalize="none"
+      onChangeText={ handleChange('name')}
       onBlur={()=> setFieldTouched('name')}/>
       {touched.name && errors.name && (<Text style={pageStyle.errorTxt}> {errors.name}</Text>)}
       </View>
@@ -94,8 +99,8 @@ export default function App() {
       <View style={pageStyle.inputWrapper}> 
       <Text style={pageStyle.errorVal}>Email </Text>
       <TextInput style= {pageStyle.inputStyle} placeholder="Email Address" value={values.email} 
-      autoCapitalize={false}
-      onChangeText={handleChange('email')}
+      autoCapitalize="none"
+      onChangeText={ handleChange('email')}
       onBlur={()=> setFieldTouched('email')}/>
       {touched.email && errors.email && (<Text style={pageStyle.errorTxt}> {errors.email}</Text>)}
       </View>
@@ -103,8 +108,8 @@ export default function App() {
       <View style={pageStyle.inputWrapper}> 
       <Text style={pageStyle.errorVal}>Password </Text>
       <TextInput style= {pageStyle.inputStyle} placeholder="Password" value={values.password} 
-      autoCapitalize={false}
-      onChangeText={handleChange('password')}
+      autoCapitalize="none"
+      onChangeText={ handleChange('password')}
       onBlur={()=> setFieldTouched('password')}/>
       {touched.password && errors.password && (<Text style={pageStyle.errorTxt}> {errors.password}</Text>)}
       </View>
@@ -112,22 +117,20 @@ export default function App() {
       <View style={pageStyle.inputWrapper}> 
       <Text style={pageStyle.errorVal}>Confirm Password </Text>
       <TextInput style= {pageStyle.inputStyle} placeholder="Confirm Password" value={values.confirmPassword} 
-      autoCapitalize={false}
-      onChangeText={handleChange('confirmPassword')}
+      autoCapitalize="none"
+      onChangeText={ handleChange('confirmPassword')}
       onBlur={()=> setFieldTouched('confirmPassword')}/>
       {touched.confirmPassword && errors.confirmPassword && (<Text style={pageStyle.errorTxt}> {errors.confirmPassword}</Text>)}
       </View>
 
 
-      <TouchableOpacity onPress={handleSubmit} style={[pageStyle.submitBtn, {backgroundColor: isValid ? '#4980FF' :"#A5C9CA"}]} disabled={!isValid}>
+      <TouchableOpacity onPress={()=> signUp(values)} style={[pageStyle.submitBtn, {backgroundColor: isValid ? '#4980FF' :"#A5C9CA"}]} disabled={isValid}>
       <Text style= {pageStyle.submitBtnTxt}> Submit</Text>
       </TouchableOpacity>
       </View>
     </View>
     )}
     </Formik>
-    <Text>this is a new day</Text>
-    </View>
   );
 }
 

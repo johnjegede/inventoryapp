@@ -11,9 +11,9 @@ import Calendar from './Calendar'
 
 export default function Availability({navigation,route}){
 
-arrows =false;
- nextMonth = true;
- singleSelect = false
+var arrows =false;
+ var nextMonth = true;
+ var singleSelect = false
 
  var months = ["January", "February", "March", "April", 
      "May", "June", "July", "August", "September", "October", 

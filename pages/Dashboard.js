@@ -5,6 +5,7 @@ import { useIsFocused } from '@react-navigation/native';
 import {db} from '../firebaseConfig';
 import {collection, getDocs} from 'firebase/firestore'
 import { MaterialIcons } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 
 
 export default function Dashboard({navigation}) {
@@ -57,6 +58,11 @@ export default function Dashboard({navigation}) {
         <MaterialIcons name="add-circle" size={30} color="black" />
         <Text style={pageStyle.textAdd}>Add an item</Text>
       </Pressable>
+      <Pressable onPress={()=>navigation.navigate('Main')}
+       style={pageStyle.button1}>
+        <Ionicons name="chevron-back-circle" size={24} color="black" />
+        <Text style={pageStyle.textAdd}>Go back to Main page</Text>
+      </Pressable>
     </View>
 
 
@@ -65,7 +71,7 @@ export default function Dashboard({navigation}) {
 
 const pageStyle = StyleSheet.create({
   container: {
-     flex: 1,
+     flex: 0.9,
   },
   listInven:{
     borderWidth: 2,

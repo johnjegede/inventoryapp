@@ -7,7 +7,7 @@ export default function Facilites({ navigation }) {
       <Text>This is the Home screen</Text>
       <View>
         <Pressable onPress={() => navigation.navigate("Invent")}>
-          <Text>Go to inventory </Text>
+          <Text>Go to inve </Text>
         </Pressable>
       </View>
 
@@ -15,7 +15,7 @@ export default function Facilites({ navigation }) {
         <Pressable
           onPress={() => navigation.navigate('Schedul')}
         >
-          <Text>Go to Schedule </Text>
+          <Text>Go to Sched </Text>
         </Pressable>
       </View>
     </View>

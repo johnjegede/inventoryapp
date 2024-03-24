@@ -18,6 +18,8 @@ import { useIsFocused } from "@react-navigation/native";
 import { doc, getDoc } from "firebase/firestore";
 import moment from "moment";
 
+
+
 var DATA = [
   {
     title: "",
@@ -39,10 +41,17 @@ export default function Home({ navigation }) {
   var nextmontVal = moment().month();
   var refid = moment().month(nextmontVal).format("MMMMYYYY");
 
+  // console.log("local",moment().locale('us').weekday(0))
+
   // console.log("next sunday", moment().day(7).format("dddd DD"));
   // console.log("next saturday", moment().day(6).format("dddd DD"));
 
   useEffect(() => {
+
+    // Set the first day of the week to monday
+    moment.updateLocale("en", { week: {
+      dow: 1, // First day of week is Sunday
+    }});
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
         const uid = user.uid;
@@ -52,7 +61,7 @@ export default function Home({ navigation }) {
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
           useUserDetails(docSnap.data());
-           console.log("Document data:", docSnap.data().availability);
+          //  console.log("Document data:", docSnap.data().availability);
            lengthVal = docSnap.data().availability.length
         } else {
           console.log("No such document!");
@@ -65,21 +74,21 @@ export default function Home({ navigation }) {
 
     const getSche = async () => {
       var prevState = [];
+      DATA[0].title = "Sheduled for  " + moment().startOf('week').day(6).format("dddd DD");
+      DATA[1].title = "Sheduled for " + moment().startOf('week').day(7).format("dddd DD");
       const docSnap = await getDoc(doc(db, "schedule", refid));
       if (docSnap.exists()) {
         // console.log("Document data:", docSnap.data().days);
         prevState = docSnap.data().days;
         for (var i = 0; i < prevState.length; i++) {
-          if (prevState[i].date == moment().day(6).format("YYYY-MM-DD")) {
-            DATA[0].title =
-              "Sheduled for  " + moment().day(6).format("dddd DD");
+          if (prevState[i].date == moment().startOf('week').day(6).format("YYYY-MM-DD")) {
+            
             DATA[0].data = prevState[i].people;
            
           } else if (
-            prevState[i].date == moment().day(7).format("YYYY-MM-DD")
+            prevState[i].date == moment().startOf('week').day(7).format("YYYY-MM-DD")
           ) {
-            DATA[1].title =
-              "Sheduled for " + moment().day(7).format("dddd DD");
+            
             DATA[1].data = prevState[i].people;
             // console.log(
             //   "Sheduled for " + moment().day(7).format("dddd DD")
@@ -90,6 +99,7 @@ export default function Home({ navigation }) {
       }
     };
     getSche();
+    
     return unsubscribe;
   }, [isFocused]);
 
